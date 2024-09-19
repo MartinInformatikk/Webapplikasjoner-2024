@@ -1,5 +1,17 @@
+import Grid from "./components/Grid";
+
+const students = [
+  { id: "1", name: "Ola Normann" },
+  { id: "2", name: "Kari Normann" },
+];
+
 function App() {
-  return <h1>Start</h1>;
+  return <div>
+    
+    <Grid students={students}/>
+
+  </div> 
+
 }
 
 export default App;
