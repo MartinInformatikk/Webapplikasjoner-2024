@@ -8,10 +8,11 @@ nav {
   max-width: 40rem;
 }
 
-nav a{
+nav button{
   
   border-right: solid 2px black;
   padding: 1.5rem;
+  
 }
 
 main section {
@@ -22,20 +23,18 @@ main section {
   margin-left: 3rem;
 }
 
-main section article{
+.project{
   border: solid 2px black;
   max-width: 40rem;
   padding: 2rem;
   border-radius: 1rem;
   margin-top: 2rem;
   margin-left: 20rem;
-
-
-  
 }
 
-main section form{
+#newProjectForm{
   display: flex;
   flex-direction: column;
   max-width: 30rem;
+  padding:2rem;
 }

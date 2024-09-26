@@ -14,10 +14,9 @@ app.use(
 
 const projectsFilePath = path.join(__dirname, 'projects.json');
 
-
 app.get('/projects', async (c) => {
   try {
-    const data = await fs.readFile("./src/projects.json", 'utf8');
+    const data = await fs.readFile(projectsFilePath, 'utf8');
     const projects = JSON.parse(data);
     return c.json(projects);
   } catch (error) {
@@ -26,14 +25,22 @@ app.get('/projects', async (c) => {
   }
 });
 
-
 app.post('/projects/add', async (c) => {
   try {
     const body = await c.req.json();
     const data = await fs.readFile(projectsFilePath, 'utf8');
     const projects = JSON.parse(data);
 
-    projects.push(body);
+
+    const project = {
+      id: projects.length + 1, 
+      name: body.name,
+      description: body.description,
+      started: body.startDate,
+      finished: body.endDate,
+    };
+
+    projects.push(project);
 
     await fs.writeFile(projectsFilePath, JSON.stringify(projects, null, 2));
 
