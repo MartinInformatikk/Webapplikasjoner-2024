@@ -1,0 +1,30 @@
+[
+  {
+    "ID": 1,
+    "name": "Webapplikasjoner 2024",
+    "description": "En webapplikasjon",
+    "started": "August 2024",
+    "finished": "December 2024",
+    "link": "lenke-til-prosjektet.com"
+  },
+  {
+    "ID": 2,
+    "name": "Webapplikasjoner 2024",
+    "description": "En webapplikasjon",
+    "started": "August 2024",
+    "finished": "December 2024",
+    "link": "lenke-til-prosjektet.com"
+  },
+  {
+    "name": "Test",
+    "description": "Test",
+    "startDate": "2023-01",
+    "endDate": "2024-06"
+  },
+  {
+    "name": "blablalba",
+    "description": "asdasdasd",
+    "startDate": "2012-august",
+    "endDate": "2013-august"
+  }
+]
