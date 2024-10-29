@@ -1,10 +1,27 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import fs from 'fs/promises';
+import Database from 'better-sqlite3';
 import path from 'path';
+import { ProjectSchema, type Project } from '../types';
 
 const app = new Hono();
+const dbPath = path.join(__dirname, 'projects.db');
+const db = new Database(dbPath);
+
+// Database initialization
+db.exec(`
+  CREATE TABLE IF NOT EXISTS projects (
+    id INTEGER PRIMARY KEY,
+    projectName TEXT NOT NULL,
+    description TEXT NOT NULL,
+    createdAt TEXT NOT NULL,
+    finishedAt TEXT NOT NULL,
+    public INTEGER NOT NULL,
+    status TEXT CHECK(status IN ('in-progress', 'finished', 'canceled')) NOT NULL,
+    publishedAt TEXT NOT NULL
+  )
+`);
 
 app.use(
   cors({
@@ -12,47 +29,137 @@ app.use(
   })
 );
 
-const projectsFilePath = path.join(__dirname, 'projects.json');
+// Helper function to convert DB row to Project type
+function rowToProject(row: any): Project {
+  return {
+    ...row,
+    public: Boolean(row.public),
+    createdAt: new Date(row.createdAt),
+    finishedAt: new Date(row.finishedAt),
+    publishedAt: new Date(row.publishedAt)
+  };
+}
 
-app.get('/projects', async (c) => {
-  try {
-    const data = await fs.readFile(projectsFilePath, 'utf8');
-    const projects = JSON.parse(data);
-    return c.json(projects);
-  } catch (error) {
-    console.error('Error reading project data:', error);
-    return c.json({ error: 'Error reading project data' }, 500);
-  }
+app.get('/projects/', (c) => {
+  const stmt = db.prepare('SELECT * FROM projects');
+  const rows = stmt.all();
+  const projects = rows.map(rowToProject);
+  return c.json<Project[]>(projects);
 });
 
 app.post('/projects/add', async (c) => {
+  const addedProject = await c.req.json();
+
+  // Convert string dates to Date objects for validation
+  if (typeof addedProject.createdAt === "string") {
+    addedProject.createdAt = new Date(addedProject.createdAt);
+  }
+  if (typeof addedProject.publishedAt === "string") {
+    addedProject.publishedAt = new Date(addedProject.publishedAt);
+  }
+  if (typeof addedProject.finishedAt === "string") {
+    addedProject.finishedAt = new Date(addedProject.finishedAt);
+  }
+
+  const project = ProjectSchema.parse(addedProject);
+  
+  const stmt = db.prepare(`
+    INSERT INTO projects (
+      id, projectName, description, createdAt, finishedAt, 
+      public, status, publishedAt
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?
+    )
+  `);
+
   try {
-    const body = await c.req.json();
-    const data = await fs.readFile(projectsFilePath, 'utf8');
-    const projects = JSON.parse(data);
+    stmt.run(
+      project.id,
+      project.projectName,
+      project.description,
+      project.createdAt.toISOString(),
+      project.finishedAt.toISOString(),
+      Number(project.public),
+      project.status,
+      project.publishedAt.toISOString()
+    );
 
-
-    const project = {
-      id: projects.length + 1, 
-      name: body.name,
-      description: body.description,
-      started: body.startDate,
-      finished: body.endDate,
-    };
-
-    projects.push(project);
-
-    await fs.writeFile(projectsFilePath, JSON.stringify(projects, null, 2));
-
-    return c.json({ message: 'Project submitted successfully!' });
+    const allProjects = db.prepare('SELECT * FROM projects').all().map(rowToProject);
+    return c.json<Project[]>(allProjects, { status: 201 });
   } catch (error) {
-    console.error('Error processing request:', error);
-    return c.json({ error: 'Error processing request' }, 500);
+    return c.json({ error: "Failed to add project" }, { status: 500 });
   }
 });
 
-const port = 3000;
+app.put("/projects/edit", async (c) => {
+  try {
+    const data = await c.req.json();
 
+    if (typeof data.createdAt === "string") {
+      data.createdAt = new Date(data.createdAt);
+    }
+    if (typeof data.publishedAt === "string") {
+      data.publishedAt = new Date(data.publishedAt);
+    }
+    if (typeof data.finishedAt === "string") {
+      data.finishedAt = new Date(data.finishedAt);
+    }
+
+    const updatedProject = ProjectSchema.parse(data);
+
+    const stmt = db.prepare(`
+      UPDATE projects 
+      SET projectName = ?, description = ?, createdAt = ?, 
+          finishedAt = ?, public = ?, status = ?, publishedAt = ?
+      WHERE id = ?
+    `);
+
+    const result = stmt.run(
+      updatedProject.projectName,
+      updatedProject.description,
+      updatedProject.createdAt.toISOString(),
+      updatedProject.finishedAt.toISOString(),
+      Number(updatedProject.public),
+      updatedProject.status,
+      updatedProject.publishedAt.toISOString(),
+      updatedProject.id
+    );
+
+    if (result.changes === 0) {
+      return c.json({ error: "Could not find project" }, { status: 404 });
+    }
+
+    return c.json({ message: "Successfully updated project" }, { status: 201 });
+  } catch (error) {
+    return c.json({ error: "Error updating project" }, { status: 500 });
+  }
+});
+
+app.delete("/projects/delete", async (c) => {
+  try {
+    const data = await c.req.json();
+    const { projectId } = data;
+
+    const stmt = db.prepare('DELETE FROM projects WHERE id = ?');
+    const result = stmt.run(projectId);
+
+    if (result.changes === 0) {
+      return c.json({ error: "Could not find project" }, { status: 404 });
+    }
+
+    return c.json({ message: "Project deleted successfully" }, { status: 201 });
+  } catch (error) {
+    return c.json({ error: "Failed to delete project" }, { status: 500 });
+  }
+});
+
+// Cleanup function for when the server is shutting down
+process.on('SIGINT', () => {
+  db.close();
+  process.exit();
+});
+
+const port = 3000;
 console.log(`Server is running on port ${port}`);
 
 serve({

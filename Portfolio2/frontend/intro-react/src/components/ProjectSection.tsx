@@ -1,31 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { ofetch } from 'ofetch';
+import useProjects from '../hooks/useProjects';
+import { formatDate } from '../util/dateService';
+import { Project } from '../types';
 
-interface Project {
-  id: number;
-  name: string;
-  description: string;
-  started: string;
-  finished: string;
-  link: string;
-}
+export default function ProjectSection({setInitialProject}: any) {
+  const { projects, deleteProject } = useProjects();
 
-const ProjectSection: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const response: Project[] = await ofetch('http://localhost:3000/projects');
-        setProjects(response);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      }
-    };
-
-    loadProjects();
-  }, []);
-
+  const handleDelete = async (project: Project) => {
+    try {
+      await deleteProject(project.id);
+      console.log(`Project ${project.projectName} was deleted successfully`);
+    }catch(error){
+      console.error("Error deleting project: ", error);
+    }
+  }
+  const handleUpdate = (project: Project) => {
+    setInitialProject(project)
+  }
   return (
     <div id="projectSection">
       <h2>All Projects</h2>
@@ -34,16 +25,17 @@ const ProjectSection: React.FC = () => {
       ) : (
         projects.map((project) => (
           <article key={project.id} className="project">
-            <h2>{project.name}</h2>
+            <h2>{project.projectName}</h2>
             <p>Beskrivelse: {project.description}</p>
-            <p>Startdato: {project.started}</p>
-            <p>Sluttdato: {project.finished}</p>
-            <a href={project.link}>Se prosjekt</a>
+            <p>Startdato: {formatDate(project.createdAt, "dd-MM-yyyy")}</p>
+            <p>Sluttdato: {formatDate(project.finishedAt, "dd-MM-yyyy")}</p>
+
+
+            <button onClick={()=>handleUpdate(project)}>Edit</button>
+            <button onClick={()=>handleDelete(project)}>Delete</button>
           </article>
         ))
       )}
     </div>
   );
 };
-
-export default ProjectSection;

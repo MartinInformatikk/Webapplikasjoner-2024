@@ -1,112 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import useProjects from '../hooks/useProjects';
+import { Project } from '../types';
+import { formatDate } from '../util/dateService';
 
-interface NewProject {
-  name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
+interface NewProjectSectionProps  {
+  initialProject?: Project;
+  onSubmit: (project: Project) => Promise<void>;
+  mode: "create" | "edit";
 }
 
-const NewProjectSection: React.FC = () => {
-  const [projectName, setProjectName] = useState<string>('');
-  const [projectDescription, setProjectDescription] = useState<string>('');
-  const [startMonth, setStartMonth] = useState<string>('');
-  const [startYear, setStartYear] = useState<string>('');
-  const [endMonth, setEndMonth] = useState<string>('');
-  const [endYear, setEndYear] = useState<string>('');
+export default function NewProjectSection({initialProject, onSubmit, mode}: NewProjectSectionProps){
+  const { projects } = useProjects();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const [projectData, setProjectData] = useState<Project>({
+    id: -1,
+    projectName: "",
+    description: "",
+    createdAt: new Date(),
+    finishedAt: new Date(),
+    public: false,
+    status: "finished",
+    publishedAt: new Date(),
+  })
 
-    const newProject: NewProject = {
-      name: projectName,
-      description: projectDescription,
-      startDate: `${startYear}-${startMonth}`,
-      endDate: `${endYear}-${endMonth}`,
-    };
+  useEffect(() => {
+    if (mode == "edit" && initialProject){
+      setProjectData(initialProject);
+    }else if( mode === "create"){
+      let lastIndexId = 0;
+      if(projects.length > 0){
+        lastIndexId = projects[projects.length-1].id + 1;
+      }
+      setProjectData(prev => ({...prev, id: lastIndexId}));
+    }
+  }, [mode, initialProject, projects])
 
-    try {
-      await fetch('http://localhost:3000/projects/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newProject),
-      });
-      alert('New project added successfully!');
-    } catch (error) {
-      console.error('Error adding project:', error);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, type, value } = e.target;
+
+    if(type === "checkbox") {
+      const checked = (e.target as HTMLInputElement).checked;
+      setProjectData(prev => ({ ...prev, [name]: checked}))
+    }else{
+      setProjectData(prev => ({...prev, [name]: value}))
     }
   };
 
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(projectData)
+    await onSubmit(projectData);
+    if(mode === "create"){
+      setProjectData({
+        id: -1,
+        projectName: "",
+        description: "",
+        createdAt: new Date(),
+        finishedAt: new Date(),
+        public: false,
+        status: "finished",
+        publishedAt: new Date(),
+      })
+    }else{
+      window.location.href = "/";
+    }
+  }
+
+  if ( mode === "create" && projectData.id === -1){
+    return <div>Loading data...</div>
+  }
+
   return (
     <div id="newProjectSection">
-      <h2>Add a New Project</h2>
+      <h2>{mode === "create" ? "Create a new Project" : "Edit the exisiting Project"}</h2>
       <form id="newProjectForm" onSubmit={handleSubmit}>
-        <label>
-          Project Name:
-          <input
-            type="text"
-            id="projectName"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Project Description:
-          <input
-            type="text"
-            id="projectDescription"
-            value={projectDescription}
-            onChange={(e) => setProjectDescription(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Start Month:
-          <input
-            type="text"
-            id="startMonth"
-            value={startMonth}
-            onChange={(e) => setStartMonth(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Start Year:
-          <input
-            type="text"
-            id="startYear"
-            value={startYear}
-            onChange={(e) => setStartYear(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          End Month:
-          <input
-            type="text"
-            id="endMonth"
-            value={endMonth}
-            onChange={(e) => setEndMonth(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          End Year:
-          <input
-            type="text"
-            id="endYear"
-            value={endYear}
-            onChange={(e) => setEndYear(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit">Add Project</button>
+        <label htmlFor='projectName'>Project name:</label>
+        <input name='projectName' type="text" id="projectName" value={projectData.projectName} onChange={handleChange} required/>
+
+        <label htmlFor='description'>Project Description:</label>
+        <textarea name="description" id="description" rows={8} value={projectData.description} onChange={handleChange}/>
+
+        <label htmlFor='finishedAt'>Finish date:</label>
+        <input name="finishedAt" id="finishedAt" type="date"  value={formatDate(projectData.finishedAt, "yyyy-MM-dd")} onChange={handleChange} required />
+
+        <label htmlFor='public'>Public?</label>
+        <input name="public" id="public" type="checkbox" checked={projectData.public} onChange={handleChange}/>
+
+        <button type="submit">{mode === "create" ? "Add Project" : "Edit Project"}</button>
       </form>
     </div>
   );
 };
-
-export default NewProjectSection;

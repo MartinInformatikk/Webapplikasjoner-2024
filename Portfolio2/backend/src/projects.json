@@ -1,44 +1,22 @@
 [
   {
-    "ID": 1,
-    "name": "Webapplikasjoner 2024",
-    "description": "En webapplikasjon",
-    "started": "August 2024",
-    "finished": "December 2024",
-    "link": "lenke-til-prosjektet.com"
+    "id": 3,
+    "projectName": "Prosjekt 2",
+    "description": "nabjajnvja",
+    "createdAt": "2024-10-29T06:10:37.813Z",
+    "finishedAt": "2024-10-27T00:00:00.000Z",
+    "public": false,
+    "status": "finished",
+    "publishedAt": "2024-10-29T06:10:37.813Z"
   },
   {
-    "ID": 2,
-    "name": "Webapplikasjoner 2024",
-    "description": "En webapplikasjon",
-    "started": "August 2024",
-    "finished": "December 2024",
-    "link": "lenke-til-prosjektet.com"
-  },
-  {
-    "name": "Test",
-    "description": "Test",
-    "startDate": "2023-01",
-    "endDate": "2024-06"
-  },
-  {
-    "name": "blablalba",
-    "description": "asdasdasd",
-    "startDate": "2012-august",
-    "endDate": "2013-august"
-  },
-  {
-    "id": 5,
-    "name": "asdasdasdsa",
-    "description": "asdasdasdasd",
-    "started": "2002-march",
-    "finished": "2004-march"
-  },
-  {
-    "id": 6,
-    "name": "blahblahblah",
-    "description": "dasdsadasdasd",
-    "started": "2011-masdm",
-    "finished": "2012-asdasdas"
+    "id": 4,
+    "projectName": "Prosjekt 3",
+    "description": "AHAHSHHDH",
+    "createdAt": "2024-10-29T07:56:43.096Z",
+    "finishedAt": "2024-10-29T07:56:43.096Z",
+    "public": false,
+    "status": "finished",
+    "publishedAt": "2024-10-29T07:56:43.096Z"
   }
 ]

@@ -5,9 +5,15 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.13.1",
-    "hono": "^4.6.3"
+    "@prisma/client": "^5.21.1",
+    "better-sqlite3": "^11.5.0",
+    "hono": "^4.6.3",
+    "prisma": "^5.21.1",
+    "sqlite3": "^5.1.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.11.17",
     "tsx": "^4.7.1"
   }
