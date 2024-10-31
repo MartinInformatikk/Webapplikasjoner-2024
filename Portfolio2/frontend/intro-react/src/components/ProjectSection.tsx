@@ -19,16 +19,16 @@ export default function ProjectSection({setInitialProject}: any) {
   }
   return (
     <div id="projectSection">
-      <h2>All Projects</h2>
+      <h2 id="projectSectionHeading">All Projects</h2>
       {projects.length === 0 ? (
         <p>No projects available.</p>
       ) : (
         projects.map((project) => (
           <article key={project.id} className="project">
             <h2>{project.projectName}</h2>
-            <p>Beskrivelse: {project.description}</p>
-            <p>Startdato: {formatDate(project.createdAt, "dd-MM-yyyy")}</p>
-            <p>Sluttdato: {formatDate(project.finishedAt, "dd-MM-yyyy")}</p>
+            <p>Description: {project.description}</p>
+            <p>Started: {formatDate(project.createdAt, "dd-MM-yyyy")}</p>
+            <p>Finished: {formatDate(project.finishedAt, "dd-MM-yyyy")}</p>
 
 
             <button onClick={()=>handleUpdate(project)}>Edit</button>

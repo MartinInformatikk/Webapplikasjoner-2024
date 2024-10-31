@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Project } from '../types';
+import { endpoints } from '../config/urls';
 
 
 const useProjects = () => {
@@ -8,7 +9,7 @@ const useProjects = () => {
 
   const getProjects = async () => {
     try {
-      const repsonse = await fetch("http://127.0.0.1:3000/projects/");
+      const repsonse = await fetch(endpoints.projects);
       if(!repsonse.ok){
         throw new Error("Network response was not ok");
       }
@@ -30,7 +31,7 @@ const useProjects = () => {
         createdAt: newProject.createdAt instanceof Date ? newProject.createdAt.toISOString() : newProject.createdAt,
       };
 
-      const response = await fetch("http://127.0.0.1:3000/projects/add", {
+      const response = await fetch(endpoints.add, {
         method: "POST",
         headers: {
           "Content-Type" : "application/json",
@@ -49,7 +50,7 @@ const useProjects = () => {
 
   const deleteProject = async (projectId: number) => {
     try {
-      const repsonse = await fetch("http://127.0.0.1:3000/projects/delete", {
+      const repsonse = await fetch(endpoints.delete, {
         method: "DELETE",
         headers: {
           "Content-Type" : "application/json",
@@ -69,7 +70,7 @@ const useProjects = () => {
 
   const updateProject = async ( newProject: Project) => {
     try {
-      const repsonse = await fetch("http://127.0.0.1:3000/projects/edit", {
+      const repsonse = await fetch(endpoints.edit, {
         method: "PUT",
         headers: {
           "Content-Type" : "application/json",

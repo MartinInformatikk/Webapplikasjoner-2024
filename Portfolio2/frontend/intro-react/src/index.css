@@ -37,4 +37,27 @@ main section {
   flex-direction: column;
   max-width: 30rem;
   padding:2rem;
+  
+}
+
+#newProjectSection{
+  margin-left: 22rem;
+  margin-top: 4rem;
+
+}
+
+#newProjectSection h2{
+  margin-left: 10rem;
+  margin-top: 4rem;
+
+}
+
+#homeSection {
+  margin-left: 20rem;
+  margin-top: 4rem;
+}
+
+#projectSectionHeading {
+  margin-left: 32rem;
+  margin-top: 4rem;
 }

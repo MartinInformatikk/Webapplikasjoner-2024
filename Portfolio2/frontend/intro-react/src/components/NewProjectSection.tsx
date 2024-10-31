@@ -82,6 +82,9 @@ export default function NewProjectSection({initialProject, onSubmit, mode}: NewP
         <label htmlFor='description'>Project Description:</label>
         <textarea name="description" id="description" rows={8} value={projectData.description} onChange={handleChange}/>
 
+        <label htmlFor='createdAt'>Create date:</label>
+        <input name="createdAt" id="createdAt" type="date"  value={formatDate(projectData.createdAt, "yyyy-MM-dd")} onChange={handleChange} required />
+
         <label htmlFor='finishedAt'>Finish date:</label>
         <input name="finishedAt" id="finishedAt" type="date"  value={formatDate(projectData.finishedAt, "yyyy-MM-dd")} onChange={handleChange} required />
 

@@ -9,7 +9,6 @@ const app = new Hono();
 const dbPath = path.join(__dirname, 'projects.db');
 const db = new Database(dbPath);
 
-// Database initialization
 db.exec(`
   CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY,
@@ -29,7 +28,6 @@ app.use(
   })
 );
 
-// Helper function to convert DB row to Project type
 function rowToProject(row: any): Project {
   return {
     ...row,
@@ -50,7 +48,6 @@ app.get('/projects/', (c) => {
 app.post('/projects/add', async (c) => {
   const addedProject = await c.req.json();
 
-  // Convert string dates to Date objects for validation
   if (typeof addedProject.createdAt === "string") {
     addedProject.createdAt = new Date(addedProject.createdAt);
   }
@@ -153,7 +150,6 @@ app.delete("/projects/delete", async (c) => {
   }
 });
 
-// Cleanup function for when the server is shutting down
 process.on('SIGINT', () => {
   db.close();
   process.exit();
