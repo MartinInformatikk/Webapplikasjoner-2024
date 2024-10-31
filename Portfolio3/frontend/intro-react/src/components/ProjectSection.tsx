@@ -29,6 +29,7 @@ export default function ProjectSection({setInitialProject}: any) {
             <p>Description: {project.description}</p>
             <p>Started: {formatDate(project.createdAt, "dd-MM-yyyy")}</p>
             <p>Finished: {formatDate(project.finishedAt, "dd-MM-yyyy")}</p>
+            <p>Public: {project.public ? "Yes" : "No"}</p>
 
 
             <button onClick={()=>handleUpdate(project)}>Edit</button>
